@@ -34,7 +34,7 @@ class Rekening implements IRekeningTbvBank {
     Rekening(int number, IKlant klant, Money saldo) {
         this.nr = number;
         this.eigenaar = klant;
-        this.saldo = saldo;
+        this.saldo = new Money(10000000,"€");
     }
 
     public boolean equals(Object obj) {

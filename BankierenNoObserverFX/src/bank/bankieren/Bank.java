@@ -17,8 +17,8 @@ public class Bank implements IBank {
 	private String name;
 
 	public Bank(String name) {
-		accounts = new HashMap<Integer,IRekeningTbvBank>();
-		clients = new ArrayList<IKlant>();
+		accounts = new HashMap<>();
+		clients = new ArrayList<>();
 		nieuwReknr = 100000000;	
 		this.name = name;	
 	}
@@ -48,8 +48,9 @@ public class Bank implements IBank {
 		return accounts.get(nr);
 	}
 
-	public boolean maakOver(int source, int destination, Money money)
+	public synchronized boolean maakOver(int source, int destination, Money money)
 			throws NumberDoesntExistException {
+                        
 		if (source == destination)
 			throw new RuntimeException(
 					"cannot transfer money to your own account");
@@ -60,7 +61,7 @@ public class Bank implements IBank {
 		if (source_account == null)
 			throw new NumberDoesntExistException("account " + source
 					+ " unknown at " + name);
-
+                
 		Money negative = Money.difference(new Money(0, money.getCurrency()),
 				money);
 		boolean success = source_account.muteer(negative);
