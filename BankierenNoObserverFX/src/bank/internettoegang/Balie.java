@@ -20,6 +20,7 @@ public class Balie extends UnicastRemoteObject implements IBalie {
 		random = new Random();
 	}
 
+        @Override
 	public String openRekening(String naam, String plaats, String wachtwoord) {
 		if (naam.equals(""))
 			return null;
