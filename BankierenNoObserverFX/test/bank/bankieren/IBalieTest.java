@@ -22,23 +22,21 @@ import static org.junit.Assert.*;
  */
 public class IBalieTest {
 
-    public IBalieTest() {
-    }
+    //Bank
+    Bank myBank = new Bank("ABNAMRO");
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    //Correct AccountNaam
+    String correctAccountNaamHenk;
+    String correctAccountNaamPeter;
 
     @Before
     public void setUp() {
+        //Maakt gebruiker aan om te gebruiken.
+        myBank.openRekening("Henk", "Eindhoven");
+        myBank.openRekening("Peter", "Eindhoven");
     }
 
-    @After
-    public void tearDown() {
+    public IBalieTest() {
     }
 
     @Test
@@ -59,77 +57,72 @@ public class IBalieTest {
          * nieuwe bankrekening kan worden verkregen
          */
 
-        IBank bank1 = new Bank("ABNAMRO");
-        IBank bank2 = new Bank("ING");
+        //Balie van de Bank
+        Balie myBalie = new Balie(myBank);
 
-        String correctName = "Henk";
-        String incorrectName = "Jur";
+        //Correcte Gegevens
+        String correctNaam = "Henk";
         String correctPlaats = "Eindhoven";
-        String incorrectPlaats = "Gol";
-        String kortWachtwoord = "123";
-        String langWachtwoord = "123456789";
         String correctWachtwoord = "12345678";
 
-        IBalie ballie = null;
-        try {
-            ballie = new Balie(bank1);
-        } catch (RemoteException ex) {
-            System.out.println("remote exception");
-        }
+        //Incorrecte Gegevens
+        String kortWachtwoord = "123";
+        String langWachtwoord = "1234567890";
+        String ergLangWachtwoord = "12345678901234567890";
+        String leegNaam = "";
+        String leegWachtwoord = "";
 
-       
-            if (ballie.openRekening(correctName, correctPlaats, correctWachtwoord) != null) {
-                Assert.assertTrue(true);
-            } else {
-                fail();
-            }
+        //Correcte accounts
+        correctAccountNaamHenk = myBalie.openRekening(correctNaam, correctPlaats, correctWachtwoord);
+        correctAccountNaamPeter = myBalie.openRekening("Peter", "Eindhoven", "87654321");
 
+        //Correcte Invulling
+        Assert.assertNotNull("Incorrecte Data", correctAccountNaamHenk);
 
-        try {
-            if (ballie.openRekening(incorrectName, correctPlaats, correctWachtwoord) != null) {
-                fail();
-            } else {
-                Assert.assertTrue(true);
-            }
-        } catch (Exception ex) {
+        //Incorrecte Wachtwoorden
+        Assert.assertNull("Kort wachtwoord error", myBalie.openRekening(correctNaam, correctPlaats, kortWachtwoord));
+        Assert.assertNull("Lang wachtwoord error", myBalie.openRekening(correctNaam, correctPlaats, langWachtwoord));
+        Assert.assertNull("Erg lang wachtwoord error", myBalie.openRekening(correctNaam, correctPlaats, ergLangWachtwoord));
 
-        }
-
-        try {
-            if (ballie.openRekening(correctName, incorrectPlaats, correctWachtwoord) != null) {
-                fail();
-            } else {
-                Assert.assertTrue(true);
-            }
-        } catch (Exception ex) {
-
-        }
-
-        try {
-            if (ballie.openRekening(incorrectName, correctPlaats, langWachtwoord) != null) {
-                fail();
-            } else {
-                Assert.assertTrue(true);
-            }
-        } catch (Exception ex) {
-
-        }
-
-        try {
-            if (ballie.openRekening(incorrectName, correctPlaats, kortWachtwoord) != null) {
-                fail();
-            } else {
-                Assert.assertTrue(true);
-            }
-        } catch (Exception ex) {
-
-        }
-
+        //Lege velden
+        Assert.assertNull("Leeg naam error", myBalie.openRekening(leegNaam, correctPlaats, correctWachtwoord));
+        Assert.assertNull("Leeg wachtwoord error", myBalie.openRekening(correctNaam, correctPlaats, leegWachtwoord));
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
+    @Test
+    public void testBalieLogin() throws RemoteException {
+
+        /**
+         * er wordt een sessie opgestart voor het login-account met de naam
+         * accountnaam mits het wachtwoord correct is
+         *
+         * @param accountnaam
+         * @param wachtwoord
+         * @return de gegenereerde sessie waarbinnen de gebruiker toegang krijgt
+         * tot de bankrekening die hoort bij het betreffende login- account mits
+         * accountnaam en wachtwoord matchen, anders null
+         */
+        //Ballie
+        Balie myBalie = new Balie(myBank);
+
+        //Correcte accounts
+        correctAccountNaamHenk = myBalie.openRekening("Henk", "Eindhoven", "12345678");
+        correctAccountNaamPeter = myBalie.openRekening("Peter", "Eindhoven", "87654321");
+
+        //Correcte Gegevens
+        String correctWachtwoord = "12345678";
+        String leegWachtwoord = "";
+        String nullWachtwoord = null;
+        String incorrectWachtwoord = "incorrectWachtwoord";
+
+        //Correcte Invulling
+        Assert.assertNotNull("Correct wachtwoord error", myBalie.logIn(correctAccountNaamHenk, correctWachtwoord));
+
+        //Incorrecte Invulling
+        Assert.assertNull("Leeg wachtwoord error", myBalie.logIn(correctAccountNaamHenk, leegWachtwoord));
+        Assert.assertNull("Null wachtwoord error", myBalie.logIn(correctAccountNaamHenk, nullWachtwoord));
+        Assert.assertNull("Incorrect wachtwoord error", myBalie.logIn(correctAccountNaamHenk, incorrectWachtwoord));
+        Assert.assertNull("Incorrect combinatie", myBalie.logIn(correctAccountNaamPeter, correctWachtwoord));
+
+    }
 }

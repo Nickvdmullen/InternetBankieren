@@ -9,8 +9,9 @@ import fontys.util.NumberDoesntExistException;
 
 public interface IBankiersessie extends Remote {
 	
-	long GELDIGHEIDSDUUR = 600000; 
+	long GELDIGHEIDSDUUR = 1000; 
 	/**
+     * @throws java.rmi.RemoteException
 	 * @returns true als de laatste aanroep van getRekening of maakOver voor deze
 	 *          sessie minder dan GELDIGHEIDSDUUR geleden is
 	 *          en er geen communicatiestoornis in de tussentijd is opgetreden, 
@@ -22,7 +23,6 @@ public interface IBankiersessie extends Remote {
 	 * er wordt bedrag overgemaakt van de bankrekening met het nummer bron naar
 	 * de bankrekening met nummer bestemming
 	 * 
-	 * @param bron
 	 * @param bestemming
 	 *            is ongelijk aan rekeningnummer van deze bankiersessie
 	 * @param bedrag
