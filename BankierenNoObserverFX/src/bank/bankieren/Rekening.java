@@ -1,12 +1,19 @@
 package bank.bankieren;
 
-class Rekening implements IRekeningTbvBank {
+import fontys.observer.BasicPublisher;
+import fontys.observer.RemotePropertyListener;
+import fontys.observer.RemotePublisher;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+class Rekening implements IRekeningTbvBank, RemotePublisher {
 
     private static final long serialVersionUID = 7221569686169173632L;
     private static final int KREDIETLIMIET = -10000;
     private int nr;
     private IKlant eigenaar;
     private Money saldo;
+    private transient BasicPublisher publisher;
 
     /**
      * creatie van een bankrekening met saldo van 0.0<br>
@@ -35,6 +42,7 @@ class Rekening implements IRekeningTbvBank {
         this.nr = number;
         this.eigenaar = klant;
         this.saldo = new Money(10000000,"€");
+        this.publisher = new BasicPublisher(new String[]{"saldo"});
     }
 
     public boolean equals(Object obj) {
@@ -67,7 +75,9 @@ class Rekening implements IRekeningTbvBank {
         }
 
         if (isTransferPossible(bedrag)) {
+            Money oldSaldo = saldo;
             saldo = Money.sum(saldo, bedrag);
+            publisher.inform(this, "saldo", oldSaldo, saldo);
             return true;
         }
         return false;
@@ -76,5 +86,16 @@ class Rekening implements IRekeningTbvBank {
     @Override
     public int getKredietLimietInCenten() {
         return KREDIETLIMIET;
+    }
+
+    @Override
+    public void addListener(RemotePropertyListener rl, String string) throws RemoteException {
+        this.publisher.addListener(rl, string);
+        System.out.println("Set listener!");
+    }
+
+    @Override
+    public void removeListener(RemotePropertyListener rl, String string) throws RemoteException {
+        this.publisher.removeListener(rl, string);
     }
 }
