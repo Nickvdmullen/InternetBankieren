@@ -1,27 +1,34 @@
 package bank.bankieren;
 
+
+import CentraleP2.IBankToCentrale;
+import CentraleP2.ICentraleToBank;
 import fontys.util.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class Bank extends UnicastRemoteObject implements IBank  {
+public class Bank extends UnicastRemoteObject implements IBank,IBankToCentrale {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8728841131739353765L;
 	private Map<Integer,IRekeningTbvBank> accounts;
+        private ICentraleToBank myCentrale;
 	private Collection<IKlant> clients;
 	private int nieuwReknr;
 	private String name;
 
-	public Bank(String name)  throws RemoteException{
+	public Bank(String name, ICentraleToBank centrale)  throws RemoteException{
 		accounts = new HashMap<>();
+                myCentrale = centrale;
 		clients = new ArrayList<>();
-		nieuwReknr = 100000000;	
-		this.name = name;	
+		nieuwReknr = myCentrale.RegisterBank(name, this) * 10000000;	
+		this.name = name;    
 	}
 
 	public int openRekening(String name, String city) {
@@ -66,23 +73,40 @@ public class Bank extends UnicastRemoteObject implements IBank  {
 		Money negative = Money.difference(new Money(0, money.getCurrency()),
 				money);
 		boolean success = source_account.muteer(negative);
-		if (!success)
+		if (!success){
 			return false;
-
-		IRekeningTbvBank dest_account = (IRekeningTbvBank) getRekening(destination);
-		if (dest_account == null) 
-			throw new NumberDoesntExistException("account " + destination
-					+ " unknown at " + name);
-		success = dest_account.muteer(money);
-
-		if (!success) // rollback
-			source_account.muteer(money);
-		return success;
+                } else {
+                    try {
+                        if(!myCentrale.maakOver(destination, money)) {
+                            //Rollback
+                            source_account.muteer(money);
+                            return false;
+                        }
+                        return true;
+                    } catch (RemoteException ex) {
+                        return false;
+                    }
+                }
 	}
 
 	@Override
 	public String getName() {
 		return name;
 	}
+
+    @Override
+    public boolean muteerVanCentrale(int RekeningNR, Money saldo) throws RemoteException, NumberDoesntExistException {
+            IRekeningTbvBank rekening = (IRekeningTbvBank) getRekening(RekeningNR);
+            
+            if(rekening != null)
+            {
+                if(saldo.isPositive())
+                {
+                    return rekening.muteer(saldo);
+                }
+            }
+            
+            return false;
+    }
 
 }

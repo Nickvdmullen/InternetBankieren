@@ -5,6 +5,7 @@
  */
 package bank.server;
 
+import CentraleP2.ICentraleToBank;
 import bank.bankieren.Bank;
 import bank.gui.BankierClient;
 import bank.internettoegang.Balie;
@@ -12,7 +13,10 @@ import bank.internettoegang.IBalie;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,34 +57,37 @@ public class BalieServer extends Application {
     }
 
     public boolean startBalie(String nameBank) {
-            
-            FileOutputStream out = null;
-            try {
-                this.nameBank = nameBank;
-                String address = java.net.InetAddress.getLocalHost().getHostAddress();
-                int port = 1099;
-                Properties props = new Properties();
-                String rmiBalie = address + ":" + port + "/" + nameBank;
-                props.setProperty("balie", rmiBalie);
-                out = new FileOutputStream(nameBank + ".props");
-                props.store(out, null);
-                out.close();
-                java.rmi.registry.LocateRegistry.createRegistry(port);
-                IBalie balie = new Balie(new Bank(nameBank));
-                Naming.rebind(nameBank, balie);
-               
-                return true;
 
+        FileOutputStream out = null;
+        try {
+            this.nameBank = nameBank;
+            String address = java.net.InetAddress.getLocalHost().getHostAddress();
+            int port = 1099;
+            Properties props = new Properties();
+            String rmiBalie = address + ":" + port + "/" + nameBank;
+            props.setProperty("balie", rmiBalie);
+            out = new FileOutputStream(nameBank + ".props");
+            props.store(out, null);
+            out.close();
+            java.rmi.registry.LocateRegistry.createRegistry(port);
+            ICentraleToBank b = (ICentraleToBank) Naming.lookup("rmi://" + rmiBalie);
+            IBalie balie = new Balie(new Bank(nameBank, b));
+            Naming.rebind(nameBank, balie);
+            return true;
+
+        } catch (IOException ex) {
+            Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NotBoundException ex) {
+            Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
+
+        } finally {
+            try {
+                out.close();
             } catch (IOException ex) {
                 Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    out.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
-            return false;
+        }
+        return false;
     }
 
     public void gotoBankSelect() {
