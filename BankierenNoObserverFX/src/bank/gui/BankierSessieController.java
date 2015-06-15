@@ -128,10 +128,11 @@ public class BankierSessieController extends UnicastRemoteObject implements Init
 
     @Override
     public void propertyChange(PropertyChangeEvent pce) throws RemoteException {
+        final PropertyChangeEvent pcevent = pce;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                Money newSaldo = (Money) pce.getNewValue();
+                Money newSaldo = (Money) pcevent.getNewValue();
                 tfBalance.setText(newSaldo.getValue() + "");
             }
         });
