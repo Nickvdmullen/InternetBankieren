@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,17 +63,19 @@ public class BalieServer extends Application {
         try {
             this.nameBank = nameBank;
             String address = java.net.InetAddress.getLocalHost().getHostAddress();
-            int port = 1099;
+            int port = 2000;
             Properties props = new Properties();
             String rmiBalie = address + ":" + port + "/" + nameBank;
             props.setProperty("balie", rmiBalie);
             out = new FileOutputStream(nameBank + ".props");
             props.store(out, null);
             out.close();
-            java.rmi.registry.LocateRegistry.createRegistry(port);
-            ICentraleToBank b = (ICentraleToBank) Naming.lookup("rmi://" + rmiBalie);
+            Registry reg = java.rmi.registry.LocateRegistry.getRegistry(address, 1090);
+            reg.list();
+            ICentraleToBank b = (ICentraleToBank) reg.lookup("Centrale");
+            reg = java.rmi.registry.LocateRegistry.createRegistry(port);
             IBalie balie = new Balie(new Bank(nameBank, b));
-            Naming.rebind(nameBank, balie);
+            reg.rebind(nameBank, balie);
             return true;
 
         } catch (IOException ex) {

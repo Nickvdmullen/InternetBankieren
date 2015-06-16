@@ -32,19 +32,17 @@ public class HoofdCentrale extends UnicastRemoteObject implements ICentraleToBan
     }
 
     @Override
-    public int RegisterBank(String Bank, Bank myBank) throws RemoteException {
-        boolean contains = true;
+    public int RegisterBank(String Bank, IBankToCentrale myBank) throws RemoteException {
+        boolean contains = false;
         for (IBankToCentrale b : allBanks) {
             if (b.getName().equals(myBank.getName())) {
                 contains = true;
-            } else {
-                contains = false;
             }
         }
 
         if (!contains) {
             allBanks.add(myBank);
-            return allBanks.indexOf(myBank);
+            return allBanks.indexOf(myBank)+1;
         }
         return -1;
 

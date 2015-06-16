@@ -8,13 +8,14 @@ package CentraleP2;
 import bank.bankieren.Bank;
 import bank.bankieren.Money;
 import fontys.util.NumberDoesntExistException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  *
  * @author Mnesymne
  */
-public interface ICentraleToBank {
+public interface ICentraleToBank extends Remote {
     
     
     /**
@@ -25,7 +26,7 @@ public interface ICentraleToBank {
      * @return int Nummer waar alle rekeningen van de bank mee moeten beginnen.
      * @throws RemoteException 
      */
-    public int RegisterBank(String Bank, Bank myBank) throws RemoteException;
+    public int RegisterBank(String Bank, IBankToCentrale myBank) throws RemoteException;
     
     /**
      * Geeft een RekeningNummer en saldo mee, RekeningNR wordt gechecked bij welke bank de Rekening hoort.

@@ -7,13 +7,14 @@ package CentraleP2;
 
 import bank.bankieren.Money;
 import fontys.util.NumberDoesntExistException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  *
  * @author Mnesymne
  */
-public interface IBankToCentrale {
+public interface IBankToCentrale extends Remote {
     
     /**
      * Geeft een RekeningNummer en saldo mee, RekeningNR wordt gechecked bij welke bank de Rekening hoort.
@@ -26,5 +27,5 @@ public interface IBankToCentrale {
      */
     public boolean muteerVanCentrale(int RekeningNR,Money saldo) throws RemoteException,NumberDoesntExistException;
     
-    String getName();
+    String getName() throws RemoteException;
 }
