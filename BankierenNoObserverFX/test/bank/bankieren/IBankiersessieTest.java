@@ -5,10 +5,12 @@
  */
 package bank.bankieren;
 
+import CentraleP2.HoofdCentrale;
 import bank.internettoegang.Bankiersessie;
 import bank.internettoegang.IBankiersessie;
 import fontys.util.InvalidSessionException;
 import fontys.util.NumberDoesntExistException;
+import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -29,9 +31,9 @@ public class IBankiersessieTest {
     int rekeningHenk;
     int rekeningPeter;
 
-    public IBankiersessieTest() throws RemoteException {
+    public IBankiersessieTest() throws RemoteException, MalformedURLException {
 
-        myBank = new Bank("ABNAMRO");
+        myBank = new Bank("ABNAMRO",new HoofdCentrale());
         rekeningHenk = myBank.openRekening("Henk", "Eindhoven");
         rekeningPeter = myBank.openRekening("Peter", "Eindhoven");
     }

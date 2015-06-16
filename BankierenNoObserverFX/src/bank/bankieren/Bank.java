@@ -27,7 +27,7 @@ public class Bank extends UnicastRemoteObject implements IBank,IBankToCentrale {
 		accounts = new HashMap<>();
                 myCentrale = centrale;
 		clients = new ArrayList<>();
-		nieuwReknr = myCentrale.RegisterBank(name, this) * 10000000;	
+		nieuwReknr = myCentrale.RegisterBank(name, this) * 10000000 + clients.size();	
 		this.name = name;    
 	}
 

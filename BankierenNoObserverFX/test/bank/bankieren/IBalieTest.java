@@ -5,8 +5,10 @@
  */
 package bank.bankieren;
 
+import CentraleP2.HoofdCentrale;
 import bank.internettoegang.Balie;
 import bank.internettoegang.IBalie;
+import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import junit.framework.Assert;
 import org.junit.After;
@@ -21,9 +23,7 @@ import static org.junit.Assert.*;
  * @author Mnesymne
  */
 public class IBalieTest {
-
-    //Bank
-    Bank myBank = new Bank("ABNAMRO");
+    Bank myBank;
 
     //Correct AccountNaam
     String correctAccountNaamHenk;
@@ -36,7 +36,8 @@ public class IBalieTest {
         myBank.openRekening("Peter", "Eindhoven");
     }
 
-    public IBalieTest() {
+    public IBalieTest() throws RemoteException, MalformedURLException {
+        this.myBank = new Bank("ABNAMRO",new HoofdCentrale());
     }
 
     @Test

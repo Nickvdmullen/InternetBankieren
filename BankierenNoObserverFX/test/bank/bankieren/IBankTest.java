@@ -5,7 +5,10 @@
  */
 package bank.bankieren;
 
+import CentraleP2.HoofdCentrale;
 import fontys.util.NumberDoesntExistException;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
 import org.junit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,9 +22,9 @@ import static org.junit.Assert.fail;
 public class IBankTest {
 
     @Test
-    public void openRekeningTest() {
+    public void openRekeningTest() throws RemoteException, MalformedURLException {
         //Maak bank aan
-        IBank bank = new Bank("ABN");
+        IBank bank = new Bank("ABN",new HoofdCentrale());
 
         //Test lege naam
         Assert.assertEquals(-1, bank.openRekening("", "Eindhoven"));
@@ -36,9 +39,9 @@ public class IBankTest {
     }
 
     @Test
-    public void maakOverTest() throws NumberDoesntExistException {
+    public void maakOverTest() throws NumberDoesntExistException, RemoteException, MalformedURLException {
         //Maak bank aan
-        IBank bank = new Bank("ABN");
+        IBank bank = new Bank("ABN",new HoofdCentrale());
 
         //Maak rekeningen aan
         int rekening1, rekening2;
@@ -80,10 +83,11 @@ public class IBankTest {
     }
 
     @Test
-    public void getNameTest() {
+    public void getNameTest() throws RemoteException, MalformedURLException {
         //Banken aanmaken
-        IBank bank1 = new Bank("ABN");
-        IBank bank2 = new Bank("Rabo");
+        HoofdCentrale c = new HoofdCentrale();
+        IBank bank1 = new Bank("ABN",c);
+        IBank bank2 = new Bank("Rabo",c);
         
         //Controleer of de naam correct is
         assertEquals(bank1.getName(), "ABN");
@@ -91,9 +95,9 @@ public class IBankTest {
     }
     
     @Test
-    public void getRekeningTest() {
+    public void getRekeningTest() throws RemoteException, MalformedURLException {
         //Bank aanmaken
-        IBank bank = new Bank("ABN");
+        IBank bank = new Bank("ABN",new HoofdCentrale());
         int rekeningNummer = bank.openRekening("Henk", "Eindhoven");
         //Controleer niet bestaand rekeningnummer
         Assert.assertNull(bank.getRekening(12));
